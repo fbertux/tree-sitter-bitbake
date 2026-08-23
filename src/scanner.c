@@ -310,6 +310,20 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
             indent_length += 8;
             skip(lexer);
         } else if (lexer->lookahead == '#') {
+            // Bitbake fix: if SHELL_CONTENT is a valid symbol here, don't
+            // silently eat "#..." as a skippable comment the way this
+            // shared Python-indentation-tracking loop normally does.
+            // Shell/bash comments inside a `do_foo() { ... }` body must
+            // stay part of the `shell_content` token so that they get
+            // included in the bash-injected virtual document (and thus
+            // highlighted correctly as `# comment` instead of silently
+            // disappearing from the tree entirely, which left them
+            // unhighlighted plain text). Bail out here and let the
+            // SHELL_CONTENT scan (further down in this function) treat
+            // '#' as ordinary shell content instead.
+            if (valid_symbols[SHELL_CONTENT] && !error_recovery_mode) {
+                break;
+            }
             // If we haven't found an EOL yet,
             // then this is a comment after an expression:
             //   foo = bar # comment

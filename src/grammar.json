@@ -1,4 +1,5 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "bitbake",
   "rules": {
     "recipe": {
@@ -6499,6 +6500,6 @@
     "primary_expression",
     "pattern",
     "parameter"
-  ]
+  ],
+  "reserved": {}
 }
-
