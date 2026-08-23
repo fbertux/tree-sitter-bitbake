@@ -278,7 +278,26 @@ module.exports = grammar({
       $.string,
       // $.number,
       $.identifier,
+      $.value_concatenation,
     ),
+
+    // BitBake, like shell, allows adjacent string/variable-expansion
+    // segments to be concatenated with no operator and no whitespace
+    // between them, e.g.:
+    //
+    //   VAR = "-DFOO="${BAR}""
+    //
+    // is a single value equivalent to `"-DFOO=" . ${BAR} . ""`. Model
+    // this the same way `concatenation` models the analogous
+    // identifier/override case, reusing the same zero-width `_concat`
+    // external token to assert there is no separating whitespace.
+    value_concatenation: $ => prec(-1, seq(
+      choice($.string, $.variable_expansion),
+      repeat1(seq(
+        $._concat,
+        choice($.string, $.variable_expansion),
+      )),
+    )),
 
     string: $ => choice(
       seq(

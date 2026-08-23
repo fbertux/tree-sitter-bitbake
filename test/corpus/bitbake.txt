@@ -24,3 +24,23 @@ inherit_defer foo
 (recipe
   (inherit_defer_directive
     (inherit_path)))
+
+==================
+Adjacent string/variable-expansion concatenation
+==================
+
+EXTRA_OECMAKE += "-DINSTALL_POST_TESTS="${POST_TESTS_PATH}""
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (value_concatenation
+        (string
+          (string_content))
+        (variable_expansion
+          (identifier))
+        (string)))))
+

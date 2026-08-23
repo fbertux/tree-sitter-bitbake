@@ -2104,6 +2104,10 @@
         {
           "type": "string",
           "named": true
+        },
+        {
+          "type": "value_concatenation",
+          "named": true
         }
       ]
     }
@@ -3014,6 +3018,25 @@
         },
         {
           "type": "variable_flag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "value_concatenation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "variable_expansion",
           "named": true
         }
       ]
