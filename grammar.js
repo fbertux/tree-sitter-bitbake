@@ -67,6 +67,7 @@ module.exports = grammar({
     $.keyword_identifier,
 
     $._dotted_identifier,
+    $._module_identifier,
   ],
 
   supertypes: $ => [
@@ -101,7 +102,7 @@ module.exports = grammar({
     )),
 
     variable_assignment: $ => seq(
-      choice($.identifier, $.concatenation),
+      choice($.identifier, $.concatenation, $._module_identifier),
       optional(choice(
         $.variable_flag,
         $.variable_expansion,
@@ -343,6 +344,7 @@ module.exports = grammar({
     )),
 
     identifier: _ => /[a-zA-Z0-9_-]+/,
+    _module_identifier: $ => alias(/[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+/, $.identifier),
     _dotted_identifier: $ => alias(/[.a-zA-Z0-9_-]+/, $.identifier),
 
     comment: _ => token(seq('#', /.*/)),

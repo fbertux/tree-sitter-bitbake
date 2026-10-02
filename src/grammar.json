@@ -101,6 +101,10 @@
             {
               "type": "SYMBOL",
               "name": "concatenation"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_module_identifier"
             }
           ]
         },
@@ -6410,6 +6414,15 @@
       "type": "PATTERN",
       "value": "[a-zA-Z0-9_-]+"
     },
+    "_module_identifier": {
+      "type": "ALIAS",
+      "content": {
+        "type": "PATTERN",
+        "value": "[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+"
+      },
+      "named": true,
+      "value": "identifier"
+    },
     "_dotted_identifier": {
       "type": "ALIAS",
       "content": {
@@ -6542,7 +6555,8 @@
     "_expressions",
     "_left_hand_side",
     "keyword_identifier",
-    "_dotted_identifier"
+    "_dotted_identifier",
+    "_module_identifier"
   ],
   "supertypes": [
     "_simple_statement",
