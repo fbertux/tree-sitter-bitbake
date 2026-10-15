@@ -183,6 +183,7 @@ module.exports = grammar({
       'include',
       alias(repeat1(choice(
         token(prec(-1, /[^"$\{\}\s]+/)),
+        $.inline_python,
         $.variable_expansion,
       )), $.include_path),
     ),
@@ -191,6 +192,7 @@ module.exports = grammar({
       'require',
       alias(repeat1(choice(
         token(prec(-1, /[^"$\{\}\s]+/)),
+        $.inline_python,
         $.variable_expansion,
       )), $.include_path),
     ),

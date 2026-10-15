@@ -489,6 +489,10 @@
                 },
                 {
                   "type": "SYMBOL",
+                  "name": "inline_python"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "variable_expansion"
                 }
               ]
@@ -523,6 +527,10 @@
                       "value": "[^\"$\\{\\}\\s]+"
                     }
                   }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "inline_python"
                 },
                 {
                   "type": "SYMBOL",

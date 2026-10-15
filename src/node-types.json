@@ -1780,6 +1780,10 @@
       "required": false,
       "types": [
         {
+          "type": "inline_python",
+          "named": true
+        },
+        {
           "type": "variable_expansion",
           "named": true
         }
