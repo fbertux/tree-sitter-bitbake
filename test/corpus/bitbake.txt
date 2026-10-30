@@ -169,3 +169,88 @@ require ${@bb.utils.contains('A', 'b', 'c.inc', '', d)}
               (string_start)
               (string_end))
             (python_identifier)))))))
+
+==================
+Directives include_all, addpylib and addfragments
+==================
+
+include_all conf/a.inc
+addpylib ${LAYERDIR}/lib oe
+addfragments ${P} A B C
+
+---
+
+(recipe
+  (include_all_directive
+    (include_path))
+  (addpylib_directive
+    (include_path
+      (variable_expansion
+        (identifier)))
+    (identifier))
+  (addfragments_directive
+    (include_path
+      (variable_expansion
+        (identifier)))
+    (identifier)
+    (identifier)
+    (identifier)))
+
+==================
+OVERRIDES as an ordinary variable
+==================
+
+OVERRIDES:append = ":${TARGET_ARCH}"
+OVERRIDES[doc] = "x"
+OVERRIDES = "${A}:b"
+
+---
+
+(recipe
+  (variable_assignment
+    (override)
+    (literal
+      (string
+        (string_content)
+        (variable_expansion
+          (identifier)))))
+  (variable_assignment
+    (variable_flag
+      (flag))
+    (literal
+      (string
+        (string_content))))
+  (variable_assignment
+    (literal
+      (string
+        (variable_expansion
+          (identifier))
+        (string_content)))))
+
+==================
+Plus in names with expansions
+==================
+
+FILES:${PN}++ = "x"
+PREFERRED_PROVIDER_virtual/nativesdk-cross-c++:class-crosssdk = "y"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (override
+      (concatenation
+        (variable_expansion
+          (identifier))
+        (identifier)))
+    (literal
+      (string
+        (string_content))))
+  (variable_assignment
+    (identifier)
+    (override
+      (identifier))
+    (literal
+      (string
+        (string_content)))))

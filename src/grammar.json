@@ -36,11 +36,19 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "export_statement"
+                "name": "include_all_directive"
               },
               {
                 "type": "SYMBOL",
-                "name": "overrides_statement"
+                "name": "addpylib_directive"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "addfragments_directive"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "export_statement"
               },
               {
                 "type": "SYMBOL",
@@ -105,6 +113,10 @@
             {
               "type": "SYMBOL",
               "name": "_module_identifier"
+            },
+            {
+              "type": "STRING",
+              "value": "OVERRIDES"
             }
           ]
         },
@@ -562,6 +574,132 @@
         }
       ]
     },
+    "include_all_directive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "include_all"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": -1,
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[^\"$\\{\\}\\s]+"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "inline_python"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "variable_expansion"
+                }
+              ]
+            }
+          },
+          "named": true,
+          "value": "include_path"
+        }
+      ]
+    },
+    "addpylib_directive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "addpylib"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": -1,
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[^\"$\\{\\}\\s]+"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "variable_expansion"
+                }
+              ]
+            }
+          },
+          "named": true,
+          "value": "include_path"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        }
+      ]
+    },
+    "addfragments_directive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "addfragments"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": -1,
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[^\"$\\{\\}\\s]+"
+                    }
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "variable_expansion"
+                }
+              ]
+            }
+          },
+          "named": true,
+          "value": "include_path"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        }
+      ]
+    },
     "export_statement": {
       "type": "SEQ",
       "members": [
@@ -581,52 +719,6 @@
               "name": "variable_assignment"
             }
           ]
-        }
-      ]
-    },
-    "overrides_statement": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "OVERRIDES"
-        },
-        {
-          "type": "STRING",
-          "value": "="
-        },
-        {
-          "type": "STRING",
-          "value": "\""
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "identifier"
-            },
-            {
-              "type": "REPEAT",
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": ":"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "identifier"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": "\""
         }
       ]
     },
@@ -6465,7 +6557,7 @@
       "type": "ALIAS",
       "content": {
         "type": "PATTERN",
-        "value": "[a-zA-Z0-9_-]+([.\\/~+][a-zA-Z0-9_-]+)+"
+        "value": "[a-zA-Z0-9_-]+(([.\\/~+][a-zA-Z0-9_-]+)+(\\+\\+)?|\\+\\+)"
       },
       "named": true,
       "value": "identifier"
@@ -6474,7 +6566,7 @@
       "type": "ALIAS",
       "content": {
         "type": "PATTERN",
-        "value": "[.a-zA-Z0-9_-]+"
+        "value": "[.a-zA-Z0-9_+\\/~-]+"
       },
       "named": true,
       "value": "identifier"

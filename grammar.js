@@ -89,8 +89,10 @@ module.exports = grammar({
         $.inherit_defer_directive,
         $.include_directive,
         $.require_directive,
+        $.include_all_directive,
+        $.addpylib_directive,
+        $.addfragments_directive,
         $.export_statement,
-        $.overrides_statement,
         $.export_functions_statement,
         $.addtask_statement,
         $.deltask_statement,
@@ -103,7 +105,7 @@ module.exports = grammar({
     )),
 
     variable_assignment: $ => seq(
-      choice($.identifier, $.concatenation, $._module_identifier),
+      choice($.identifier, $.concatenation, $._module_identifier, 'OVERRIDES'),
       optional(choice(
         $.variable_flag,
         $.variable_expansion,
@@ -198,17 +200,39 @@ module.exports = grammar({
       )), $.include_path),
     ),
 
+    // `include_all <path>`: include every matching file from all layers.
+    include_all_directive: $ => seq(
+      'include_all',
+      alias(repeat1(choice(
+        token(prec(-1, /[^"$\{\}\s]+/)),
+        $.inline_python,
+        $.variable_expansion,
+      )), $.include_path),
+    ),
+
+    // `addpylib <dir> <namespace>`
+    addpylib_directive: $ => seq(
+      'addpylib',
+      alias(repeat1(choice(
+        token(prec(-1, /[^"$\{\}\s]+/)),
+        $.variable_expansion,
+      )), $.include_path),
+      $.identifier,
+    ),
+
+    // `addfragments <prefix> <var> <var> <var>`
+    addfragments_directive: $ => seq(
+      'addfragments',
+      alias(repeat1(choice(
+        token(prec(-1, /[^"$\{\}\s]+/)),
+        $.variable_expansion,
+      )), $.include_path),
+      repeat1($.identifier),
+    ),
+
     export_statement: $ => seq(
       'export',
       choice($.identifier, $.variable_assignment),
-    ),
-
-    overrides_statement: $ => seq(
-      'OVERRIDES',
-      '=',
-      '"',
-      sep1($.identifier, ':'),
-      '"',
     ),
 
     export_functions_statement: $ => seq(
@@ -360,8 +384,8 @@ module.exports = grammar({
     identifier: _ => /[a-zA-Z0-9_-]+/,
     // Override names may also end with `+`, e.g. `FILES:libstdc++`.
     _override_identifier: $ => alias(/[a-zA-Z0-9_-]+([+.\/~]+[a-zA-Z0-9_-]*)+/, $.identifier),
-    _module_identifier: $ => alias(/[a-zA-Z0-9_-]+([.\/~+][a-zA-Z0-9_-]+)+/, $.identifier),
-    _dotted_identifier: $ => alias(/[.a-zA-Z0-9_-]+/, $.identifier),
+    _module_identifier: $ => alias(/[a-zA-Z0-9_-]+(([.\/~+][a-zA-Z0-9_-]+)+(\+\+)?|\+\+)/, $.identifier),
+    _dotted_identifier: $ => alias(/[.a-zA-Z0-9_+\/~-]+/, $.identifier),
 
     comment: _ => token(seq('#', /.*/)),
   },

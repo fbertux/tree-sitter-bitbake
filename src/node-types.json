@@ -312,6 +312,25 @@
     ]
   },
   {
+    "type": "addfragments_directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "include_path",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "addhandler_statement",
     "named": true,
     "fields": {},
@@ -321,6 +340,25 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "addpylib_directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "include_path",
           "named": true
         }
       ]
@@ -1757,6 +1795,21 @@
     }
   },
   {
+    "type": "include_all_directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "include_path",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "include_directive",
     "named": true,
     "fields": {},
@@ -2220,21 +2273,6 @@
     }
   },
   {
-    "type": "overrides_statement",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "pair",
     "named": true,
     "fields": {
@@ -2485,7 +2523,15 @@
       "required": false,
       "types": [
         {
+          "type": "addfragments_directive",
+          "named": true
+        },
+        {
           "type": "addhandler_statement",
+          "named": true
+        },
+        {
+          "type": "addpylib_directive",
           "named": true
         },
         {
@@ -2513,6 +2559,10 @@
           "named": true
         },
         {
+          "type": "include_all_directive",
+          "named": true
+        },
+        {
           "type": "include_directive",
           "named": true
         },
@@ -2522,10 +2572,6 @@
         },
         {
           "type": "inherit_directive",
-          "named": true
-        },
-        {
-          "type": "overrides_statement",
           "named": true
         },
         {
@@ -3504,7 +3550,15 @@
     "named": false
   },
   {
+    "type": "addfragments",
+    "named": false
+  },
+  {
     "type": "addhandler",
+    "named": false
+  },
+  {
+    "type": "addpylib",
     "named": false
   },
   {
@@ -3654,6 +3708,10 @@
   },
   {
     "type": "include",
+    "named": false
+  },
+  {
+    "type": "include_all",
     "named": false
   },
   {
