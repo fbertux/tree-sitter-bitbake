@@ -8,6 +8,7 @@ set -eu
 
 cd "$(dirname "$0")/.."
 sources=${1:?usage: $0 <sources-dir> [--update]}
+sources=${sources%/}
 known=script/known_failures_oe.txt
 
 list=$(mktemp)
@@ -18,8 +19,10 @@ find "$sources/openembedded-core" "$sources/bitbake" -type f \
 	\( -name '*.bb' -o -name '*.bbappend' -o -name '*.bbclass' -o -name '*.inc' \) >"$list"
 find "$sources/openembedded-core/meta/conf" -type f -name '*.conf' >>"$list"
 
-tree-sitter parse -q -s --paths "$list" >"$out" 2>&1 || true
-failed=$(grep -E '\(ERROR|\(MISSING' "$out" | cut -f1 | sed "s#^$sources/##" | sort)
+# --rebuild: the CLI caches the compiled grammar by name and could reuse a
+# stale one built from another checkout.
+tree-sitter parse -q -s --rebuild --paths "$list" >"$out" 2>&1 || true
+failed=$(grep -E '\(ERROR|\(MISSING' "$out" | cut -f1 | sed -e 's/[[:space:]]*$//' -e "s#^$sources/##" | sort)
 total=$(wc -l <"$list")
 count=$(grep -c . <<<"$failed" || true)
 printf 'Parsed %d files, %d with errors\n' "$total" "$count"
