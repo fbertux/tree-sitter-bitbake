@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Parse every BitBake file of a local OE-core/bitbake checkout and fail when a
+# file that is not listed in script/known_failures_oe.txt has parse errors.
+#
+#   script/parse-oe-core <sources-dir>   # dir holding openembedded-core/ and bitbake/
+#   script/parse-oe-core <sources-dir> --update   # rewrite the known failures
+set -eu
+
+cd "$(dirname "$0")/.."
+sources=${1:?usage: $0 <sources-dir> [--update]}
+known=script/known_failures_oe.txt
+
+list=$(mktemp)
+out=$(mktemp)
+trap 'rm -f "$list" "$out"' EXIT
+
+find "$sources/openembedded-core" "$sources/bitbake" -type f \
+	\( -name '*.bb' -o -name '*.bbappend' -o -name '*.bbclass' -o -name '*.inc' \) >"$list"
+find "$sources/openembedded-core/meta/conf" -type f -name '*.conf' >>"$list"
+
+tree-sitter parse -q -s --paths "$list" >"$out" 2>&1 || true
+failed=$(grep -E '\(ERROR|\(MISSING' "$out" | cut -f1 | sed "s#^$sources/##" | sort)
+total=$(wc -l <"$list")
+count=$(grep -c . <<<"$failed" || true)
+printf 'Parsed %d files, %d with errors\n' "$total" "$count"
+
+if [ "${2:-}" = "--update" ]; then
+	printf '%s\n' "$failed" >"$known"
+	exit 0
+fi
+
+new=$(comm -13 <(sort "$known") <(printf '%s\n' "$failed") | grep . || true)
+if [ -n "$new" ]; then
+	echo "New parse failures:"
+	echo "$new"
+	exit 1
+fi
