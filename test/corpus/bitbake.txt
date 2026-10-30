@@ -44,3 +44,128 @@ EXTRA_OECMAKE += "-DINSTALL_POST_TESTS="${POST_TESTS_PATH}""
           (identifier))
         (string)))))
 
+==================
+Override expansion inside variable expansion
+==================
+
+A = "${TUNE_FEATURES:tune-armv7a} thumb"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (string
+        (variable_expansion
+          (identifier))
+        (string_content)))))
+
+==================
+Nested variable expansion in string
+==================
+
+A = "${FOO_${BAR}}"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (string
+        (variable_expansion
+          (identifier)
+          (variable_expansion
+            (identifier)))))))
+
+==================
+Slash in variable name
+==================
+
+PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (string
+        (string_content)))))
+
+==================
+Plus and dot in override names
+==================
+
+FILES:libstdc++ = "x"
+ALLOW_EMPTY:gstreamer1.0-meta-base = "1"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (override
+      (identifier))
+    (literal
+      (string
+        (string_content))))
+  (variable_assignment
+    (identifier)
+    (override
+      (identifier))
+    (literal
+      (string
+        (string_content)))))
+
+==================
+Dotted module path on assignment LHS
+==================
+
+oe.utils.foo = "1"
+
+---
+
+(recipe
+  (variable_assignment
+    (identifier)
+    (literal
+      (string
+        (string_content)))))
+
+==================
+Inline python in require path
+==================
+
+require ${@bb.utils.contains('A', 'b', 'c.inc', '', d)}
+
+---
+
+(recipe
+  (require_directive
+    (include_path
+      (inline_python
+        (call
+          (attribute
+            (attribute
+              (python_identifier)
+              (python_identifier))
+            (python_identifier))
+          (argument_list
+            (python_string
+              (string_start)
+              (string_content)
+              (string_end))
+            (python_string
+              (string_start)
+              (string_content)
+              (string_end))
+            (python_string
+              (string_start)
+              (string_content)
+              (string_end))
+            (python_string
+              (string_start)
+              (string_end))
+            (python_identifier)))))))

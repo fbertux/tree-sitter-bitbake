@@ -123,7 +123,7 @@ foo () {
 
 =================
 Inline Python in string
-==================
+=================
 
 foo () {
     echo "${@test}"
@@ -216,3 +216,21 @@ foo () {
     (identifier)
     (shell_content)))
 
+==================
+Comment between shell commands
+==================
+
+foo () {
+    echo a
+    # comment
+    echo b
+}
+
+---
+
+(recipe
+  (function_definition
+    (identifier)
+    (shell_content)
+    (shell_content)
+    (shell_content)))

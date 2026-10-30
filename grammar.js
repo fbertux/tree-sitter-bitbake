@@ -68,6 +68,7 @@ module.exports = grammar({
 
     $._dotted_identifier,
     $._module_identifier,
+    $._override_identifier,
   ],
 
   supertypes: $ => [
@@ -137,7 +138,7 @@ module.exports = grammar({
           'append',
           'prepend',
           'remove',
-          seq($.identifier, optional($.variable_flag)),
+          seq(choice($.identifier, $._override_identifier), optional($.variable_flag)),
           $.variable_expansion,
           $.concatenation,
         ),
@@ -332,7 +333,16 @@ module.exports = grammar({
 
     inline_python: $ => seq('${@', $.expression, '}'),
 
-    variable_expansion: $ => seq('${', optional($.identifier), '}'),
+    // Mirrors BitBake's __expand_var_regexp__ (`\${[a-zA-Z0-9\-_+./~:]+}`);
+    // expansions can be nested, e.g. `${FOO_${BAR}}` or `${TUNE:tune-x}`.
+    variable_expansion: $ => seq(
+      '${',
+      repeat(choice(
+        alias(token.immediate(/[a-zA-Z0-9_+.\/~:-]+/), $.identifier),
+        $.variable_expansion,
+      )),
+      '}',
+    ),
 
     ...pythonCode,
 
@@ -345,8 +355,12 @@ module.exports = grammar({
       optional($._concat),
     )),
 
+    // BitBake variable names may also contain `+ . / ~` (ConfHandler.py), e.g.
+    // `PREFERRED_PROVIDER_virtual/kernel`.
     identifier: _ => /[a-zA-Z0-9_-]+/,
-    _module_identifier: $ => alias(/[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+/, $.identifier),
+    // Override names may also end with `+`, e.g. `FILES:libstdc++`.
+    _override_identifier: $ => alias(/[a-zA-Z0-9_-]+([+.\/~]+[a-zA-Z0-9_-]*)+/, $.identifier),
+    _module_identifier: $ => alias(/[a-zA-Z0-9_-]+([.\/~+][a-zA-Z0-9_-]+)+/, $.identifier),
     _dotted_identifier: $ => alias(/[.a-zA-Z0-9_-]+/, $.identifier),
 
     comment: _ => token(seq('#', /.*/)),
