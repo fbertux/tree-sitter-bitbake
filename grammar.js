@@ -50,6 +50,9 @@ module.exports = grammar({
     '}',
 
     $.shell_content,
+
+    $._bitbake_double_quote,
+    $._bitbake_single_quote,
   ],
 
   extras: $ => [
@@ -309,16 +312,11 @@ module.exports = grammar({
       $.value_concatenation,
     ),
 
-    // BitBake, like shell, allows adjacent string/variable-expansion
-    // segments to be concatenated with no operator and no whitespace
-    // between them, e.g.:
-    //
-    //   VAR = "-DFOO="${BAR}""
-    //
-    // is a single value equivalent to `"-DFOO=" . ${BAR} . ""`. Model
-    // this the same way `concatenation` models the analogous
-    // identifier/override case, reusing the same zero-width `_concat`
-    // external token to assert there is no separating whitespace.
+    // Retain support for adjacent RHS segments outside a quoted value,
+    // using the same zero-width `_concat` token as LHS concatenation.
+    // Fully quoted assignments such as `VAR = "-DFOO="${BAR}""` are
+    // instead one string: BitBake retains the inner quotes, which the
+    // external scanner recognizes as string_content.
     value_concatenation: $ => prec(-1, seq(
       choice($.string, $.variable_expansion),
       repeat1(seq(
@@ -332,7 +330,7 @@ module.exports = grammar({
         '"',
         repeat(choice(
           alias(token.immediate(prec(1, /([^"$\\]|\\.?|\\?\r?\n)+/)), $.string_content),
-          /"[^"$\\\s]+"/,
+          alias($._bitbake_double_quote, $.string_content),
           $.variable_expansion,
           $.inline_python,
           '$BB_ENV_PASSTHROUGH',
@@ -345,7 +343,7 @@ module.exports = grammar({
         '\'',
         repeat(choice(
           alias(token.immediate(prec(1, /([^'$\\]|\\?\r?\n)+/)), $.string_content),
-          token(prec(-1, /"[^"$\\\s]+"/)),
+          alias($._bitbake_single_quote, $.string_content),
           $.variable_expansion,
           $.inline_python,
           '$BB_ENV_PASSTHROUGH',

@@ -37,12 +37,12 @@ EXTRA_OECMAKE += "-DINSTALL_POST_TESTS="${POST_TESTS_PATH}""
   (variable_assignment
     (identifier)
     (literal
-      (value_concatenation
-        (string
-          (string_content))
+      (string
+        (string_content)
+        (string_content)
         (variable_expansion
           (identifier))
-        (string)))))
+        (string_content)))))
 
 ==================
 Override expansion inside variable expansion

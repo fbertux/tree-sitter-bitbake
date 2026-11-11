@@ -1105,8 +1105,13 @@
                     "value": "string_content"
                   },
                   {
-                    "type": "PATTERN",
-                    "value": "\"[^\"$\\\\\\s]+\""
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_bitbake_double_quote"
+                    },
+                    "named": true,
+                    "value": "string_content"
                   },
                   {
                     "type": "SYMBOL",
@@ -1178,15 +1183,13 @@
                     "value": "string_content"
                   },
                   {
-                    "type": "TOKEN",
+                    "type": "ALIAS",
                     "content": {
-                      "type": "PREC",
-                      "value": -1,
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "\"[^\"$\\\\\\s]+\""
-                      }
-                    }
+                      "type": "SYMBOL",
+                      "name": "_bitbake_single_quote"
+                    },
+                    "named": true,
+                    "value": "string_content"
                   },
                   {
                     "type": "SYMBOL",
@@ -6685,6 +6688,14 @@
     {
       "type": "SYMBOL",
       "name": "shell_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_bitbake_double_quote"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_bitbake_single_quote"
     }
   ],
   "inline": [

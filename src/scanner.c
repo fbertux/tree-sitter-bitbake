@@ -55,6 +55,9 @@ enum TokenType {
     CLOSE_BRACE,
 
     SHELL_CONTENT,
+
+    BITBAKE_DOUBLE_QUOTE,
+    BITBAKE_SINGLE_QUOTE,
 };
 
 typedef enum {
@@ -171,6 +174,27 @@ bool tree_sitter_bitbake_external_scanner_scan(void *payload, TSLexer *lexer, co
 
     bool error_recovery_mode = valid_symbols[STRING_CONTENT] && valid_symbols[INDENT];
     bool within_brackets = valid_symbols[CLOSE_BRACE] || valid_symbols[CLOSE_PAREN] || valid_symbols[CLOSE_BRACKET];
+
+    // BitBake assignment values are delimited by the first and last quote
+    // of the logical line, not by shell/Python quoting rules. A matching
+    // quote followed by more text (including a line continuation) is part
+    // of the value. Keep expansions after these inner quotes in the same
+    // string rather than ending the assignment early.
+    if (!error_recovery_mode &&
+        ((valid_symbols[BITBAKE_DOUBLE_QUOTE] && lexer->lookahead == '"') ||
+         (valid_symbols[BITBAKE_SINGLE_QUOTE] && lexer->lookahead == '\''))) {
+        int32_t quote = lexer->lookahead;
+        advance(lexer);
+        lexer->mark_end(lexer);
+        while (iswspace(lexer->lookahead) && lexer->lookahead != '\n' && lexer->lookahead != '\r') {
+            advance(lexer);
+        }
+        if (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r') {
+            lexer->result_symbol = quote == '"' ? BITBAKE_DOUBLE_QUOTE : BITBAKE_SINGLE_QUOTE;
+            return true;
+        }
+        return false;
+    }
 
     if (valid_symbols[CONCAT] && !error_recovery_mode) {
         if (!(lexer->lookahead == 0 || iswspace(lexer->lookahead) || lexer->lookahead == '(' ||
